@@ -18,10 +18,6 @@ class MyDelegate(btle.DefaultDelegate):
             rr_interval = 16 * data_ints[i] + data_ints[i+1];
             print("RR_interval measured (peak to peak of heart beat): %d ms" %(rr_interval));
 
-
-
-
-
 def main():
     try:
         heartrateP = btle.Peripheral("d2:89:67:b7:bc:aa", btle.ADDR_TYPE_RANDOM)
