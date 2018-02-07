@@ -8,8 +8,15 @@ class MyDelegate(btle.DefaultDelegate):
 
     def handleNotification(self, cHandle, data):
         data_ints = struct.unpack('<' + 'B'*len(data), data)
-        print (data_ints)
-        print("Your heartbeat is : %d" %(data[1]))
+
+
+        #Averages number of beats per minute
+        print("Your heartbeat is : %d" %(data_ints[1]))
+
+        #Display RR Interval
+        for i in range(2, len(data_ints), 2):
+            rr_interval = 16 * data_ints[i] + data_ints[i+1];
+            print("RR_interval measured (peak to peak of heart beat): %d ms" %(rr_interval));
 
 
 
@@ -34,7 +41,7 @@ def main():
 
         while True:
             if heartrateP.waitForNotifications(2.0):
-                print("waiting for notifications")
+
                 continue
             else:
                 print("no notification found")
