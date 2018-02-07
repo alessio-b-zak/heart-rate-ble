@@ -49,17 +49,16 @@ def startup():
         print(e)
 
 
+def calculate_heart():
+    global heartrateCurrent
+    return str(heartrateCurrent)
+
 
 
 
 @server.route('/')
 def index():
-    global heartrateCurrent
-    if heartrateCurrent == None:
-        return("Not yet Configured")
-    else:
-        return str(heartrateCurrent)
-
+    return calculate_heart()
 
 
 from server import routes
