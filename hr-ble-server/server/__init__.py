@@ -2,18 +2,17 @@ from flask import Flask
 from bluepy import btle
 import struct
 import threading
-import atexit 
-
-
+import atexit
 
 class MyDelegate(btle.DefaultDelegate):
     def __init__(self):
         btle.DefaultDelegate.__init__(self)
 
     def handleNotification(self, cHandle, data):
-        global heartrateCurrent
+        global commonDataStruct
         data_ints = struct.unpack('<' + 'B'*len(data), data)
-        heartrateCurrent = data
+        print("handling notification")
+        commonDataStruct['heartrateP'] = data
 
 
         #Averages number of beats per minute
@@ -40,16 +39,26 @@ def create_app():
     def doStuff():
         global commonDataStruct
         global yourThread
-        with dataLock:
-        # Do your stuff with commonDataStruct Here
-            if (not commonDataStruct['heartrateP'] == None):
-                commonDataStruct['heartrateP'] += 10
-            else:
-                commonDataStruct['heartrateP'] = 0
-
-        # Set the next thread to happen
+        #with dataLock:
+        #    if not commonDataStruct['peripheral'] == None:
+        #        #Do your stuff with commonDataStruct Here
+        #            print(commonDataStruct['peripheral'])
+        #            if commonDataStruct['peripheral'].waitForNotifications(2.0):
+        #                pass
+        #            else:
+        #                print("no notification found")
+        #        # Set the next thread to happen
+        #    else:
+        #        try:
+        #            # commonDataStruct['peripheral'] = btle.Peripheral("d2:89:67:b7:bc:aa", btle.ADDR_TYPE_RANDOM)
+        #            # commonDataStruct['peripheral'].setDelegate(MyDelegate())
+        #            # print("successfully connected")
+        #                   # task = poll_heart_rate.delay()
+        #            pass
+        #        except Exception as e:
+        #            print(e)
         yourThread = threading.Timer(POOL_TIME, doStuff, ())
-        yourThread.start()   
+        yourThread.start()
 
     def doStuffStart():
         # Do initialisation stuff here
@@ -61,6 +70,7 @@ def create_app():
     # Initiate
     doStuffStart()
     # When you kill Flask (SIGTERM), clear the trigger for the next thread
+
     atexit.register(interrupt)
     return app
 
@@ -78,23 +88,10 @@ server = create_app()
 #
 #
 #
-#@server.before_first_request
-#def startup():
-#    global heartrateP
-#    try:
-#        # heartrateP = btle.Peripheral("d2:89:67:b7:bc:aa", btle.ADDR_TYPE_RANDOM)
-#        # heartrateP.setDelegate(Deleate())
-#        task = poll_heart_rate.delay()
-#    except Exception as e:
-#        print(e)
-
 
 def calculate_heart():
     global commonDataStruct
     return str(commonDataStruct['heartrateP'])
-
-
-
 
 @server.route('/')
 def index():
