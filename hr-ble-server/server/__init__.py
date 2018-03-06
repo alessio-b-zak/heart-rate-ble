@@ -28,7 +28,6 @@ dataLock = threading.Lock()
 yourThread = threading.Thread()
 
 
-
 def create_app():
     app = Flask(__name__)
 
@@ -39,24 +38,25 @@ def create_app():
     def doStuff():
         global commonDataStruct
         global yourThread
-        #with dataLock:
-        #    if not commonDataStruct['peripheral'] == None:
-        #        #Do your stuff with commonDataStruct Here
-        #            print(commonDataStruct['peripheral'])
-        #            if commonDataStruct['peripheral'].waitForNotifications(2.0):
-        #                pass
-        #            else:
-        #                print("no notification found")
-        #        # Set the next thread to happen
-        #    else:
-        #        try:
-        #            # commonDataStruct['peripheral'] = btle.Peripheral("d2:89:67:b7:bc:aa", btle.ADDR_TYPE_RANDOM)
-        #            # commonDataStruct['peripheral'].setDelegate(MyDelegate())
-        #            # print("successfully connected")
-        #                   # task = poll_heart_rate.delay()
-        #            pass
-        #        except Exception as e:
-        #            print(e)
+        with dataLock:
+            if not commonDataStruct['peripheral'] == None:
+                #Do your stuff with commonDataStruct Here
+                    print(commonDataStruct['peripheral'])
+                    if commonDataStruct['peripheral'].waitForNotifications(2.0):
+                        pass
+                    else:
+                        print("no notification found")
+                # Set the next thread to happen
+            else:
+                try:
+                    commonDataStruct['peripheral'] = btle.Peripheral("d2:89:67:b7:bc:aa", btle.ADDR_TYPE_RANDOM)
+                    commonDataStruct['peripheral'].setDelegate(MyDelegate())
+                    commonDataStruct['peripheral'].writeCharacteristic(15, struct.pack('<bb',1,0),True)
+                    print("successfully connected")
+                    # task = poll_heart_rate.delay()
+                    pass
+                except Exception as e:
+                    print(e)
         yourThread = threading.Timer(POOL_TIME, doStuff, ())
         yourThread.start()
 
