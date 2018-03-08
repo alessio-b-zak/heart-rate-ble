@@ -9,6 +9,8 @@ verify_ssl = true
 
 bluepy = "*"
 flask = "*"
+celery = "*"
+redis = "*"
 
 
 [requires]
