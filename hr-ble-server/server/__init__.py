@@ -12,7 +12,7 @@ class MyDelegate(btle.DefaultDelegate):
         global commonDataStruct
         data_ints = struct.unpack('<' + 'B'*len(data), data)
         print("handling notification")
-        commonDataStruct['heartrateP'] = data
+        commonDataStruct['heartrateP'] = data_ints[1]
 
 
         #Averages number of beats per minute
@@ -96,6 +96,5 @@ def calculate_heart():
 @server.route('/')
 def index():
     return calculate_heart()
-
 
 from server import routes
