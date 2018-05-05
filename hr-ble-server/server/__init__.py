@@ -1,6 +1,8 @@
 from flask import Flask
 from bluepy import btle
 import struct
+from random import randint
+import matplotlib.pyplot as plt
 import threading
 import atexit
 
@@ -13,20 +15,19 @@ class MyDelegate(btle.DefaultDelegate):
         data_ints = struct.unpack('<' + 'B'*len(data), data)
         print("handling notification")
         commonDataStruct['heartrateP'] = data_ints[1]
-
-
-        #Averages number of beats per minute
+        with open("test.txt", "a") as myfile:
+            t_ = str(commonDataStruct['heartrateP'])
+            myfile.write(f"\n{t_}")
 
 POOL_TIME = 5 #Seconds
 
 # variables that are accessible from anywhere
-commonDataStruct = {'peripheral' : None, 'heartrateP' : None}
+commonDataStruct = {'peripheral' : None, 'heartrateP' : None, 'heartOTime': [], 'time': 0}
 
 # lock to control access to variable
 dataLock = threading.Lock()
 # thread handler
 yourThread = threading.Thread()
-
 
 def create_app():
     app = Flask(__name__)
@@ -53,7 +54,7 @@ def create_app():
                     commonDataStruct['peripheral'].setDelegate(MyDelegate())
                     commonDataStruct['peripheral'].writeCharacteristic(15, struct.pack('<bb',1,0),True)
                     print("successfully connected")
-                    # task = poll_heart_rate.delay()
+                    task = poll_heart_rate.delay()
                     pass
                 except Exception as e:
                     print(e)

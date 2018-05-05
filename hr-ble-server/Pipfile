@@ -11,6 +11,7 @@ bluepy = "*"
 flask = "*"
 celery = "*"
 redis = "*"
+matplotlib = "*"
 
 
 [requires]
